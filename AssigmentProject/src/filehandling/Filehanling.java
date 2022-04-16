@@ -1,86 +1,193 @@
 package filehandling;
 
-	import java.io.BufferedWriter;
-	import java.io.File;
-	import java.io.FileNotFoundException;
-	import java.io.FileWriter;
-	import java.io.IOException;
-	import java.io.PrintWriter;
-	import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
-	public class Filehanling {
-
-		public static void main(String[] args) throws IOException {
-			CreateFileClass();
-			ReadFileClass();
-			DeleteFileClass();
-			appendFileClass();
-		}
-		
-		//Here we can creating file file.txt
-		private static void CreateFileClass() throws IOException {
-			File file = new File("file.txt");
-			if(file.createNewFile()) {
-				System.out.println("File Create Succefully!!!");
-			}else if(file.isFile()){
-				System.out.println("File is already Exits..");
-			}else {
-				System.out.println("File is not Created");
+public class Filehanling{
+	public static void main(String[] args) {
+		Scanner strInput = new Scanner(System.in);
+		String choice, cont = "y";
+		while (cont.equalsIgnoreCase("y")) {
+			System.out.println("\t\t Employee Information System\n\n");
+			System.out.println("1 ===> Add New Employee Record ");
+			System.out.println("2 ===> View All Employee Record ");
+			System.out.println("3 ===> Delete Employee Record ");
+			System.out.println("4 ===> Search Specific Record ");
+			System.out.println("5 ===> Update Specific Record ");
+			System.out.print("\n\n");
+			System.out.println("Enter your choice: ");
+			choice = strInput.nextLine();
+			if (choice.equals("1")) {
+				try {
+					AddRecord();
+				} catch (IOException e) {
+// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (choice.equals("2")) {
+				try {
+					ViewAllRecord();
+				} catch (IOException e) {
+// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (choice.equals("3")) {
+				try {
+					DeleteRecordByID();
+				} catch (IOException e) {
+// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (choice.equals("4")) {
+				try {
+					SearchRecordbyID();
+				} catch (IOException e) {
+// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (choice.equals("5")) {
+				try {
+					updateRecordbyID();
+				} catch (IOException e) {
+// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			FileWriter write = new FileWriter("file.txt");
-			write.write("Hello Simply Learning. Java Full Stack Developer");
-			write.write("File Creating,Deleting,Reading operation are perfromed");
-			write.close();		
-			System.out.println("\n");
+			System.out.println("Do you want to continue? Y/N");
+			cont = strInput.nextLine();
 		}
-		//Here we can read the file
-		private static void ReadFileClass() throws IOException {
-			File file = new File("file.txt");
-	        try {
-	            Scanner sc = new Scanner(file);
-	            while(sc.hasNextLine()){
-	                String line = sc.nextLine();
-	                System.out.println("You can Read Your File:\n"+line);
-	            }
-	            sc.close();
-	        } catch (FileNotFoundException e) {
-	            e.printStackTrace();
-	        }
-		}
-		
-	//here i m creating one more file and that file i going deleting
-		private static void DeleteFileClass() throws IOException {
-			//creating file
-			File file = new File("readwrite.txt");//creating one file deleting that file only
-			if(file.createNewFile()) {
-				System.out.println("File Create Succefully!!!");
-			}else if(file.isFile()){
-				System.out.println("File is already Exits..");
-			}else {
-				System.out.println("File is not Created");
-			}
-			//deleting file readwrite
-			if(file.delete())
-			{
-				System.out.println("File Succesfully Deleted.."+file.getName());
-			}
-			else {
-				System.out.println("File Not! deleted so please Try again...");
-			}
-			
-		}
-		private static void appendFileClass() throws IOException{
-			//re-writing the file which one deleted before in deleted operation
-			FileWriter fw = new FileWriter("readwrite.txt", true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			PrintWriter out = new PrintWriter(bw);
-			System.out.println("File Successfully Append");
-		    
-		    FileWriter write = new FileWriter("readwrite.txt");
-			write.write("Hello Simply Learning. Java Full Stack Developer");
-			write.write("File Creating,Deleting,Reading operation are perfromed");
-			write.close();	    
-		   
-		}
-				  
 	}
+
+	public static void AddRecord() throws IOException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter("records.txt", true));
+		Scanner strInput = new Scanner(System.in);
+		String ID, name, age, addr;
+		System.out.print("Enter the Employee ID: ");
+		ID = strInput.nextLine();
+		System.out.print("Enter the Employee Name: ");
+		name = strInput.nextLine();
+		System.out.print("Enter the Employee Age: ");
+		age = strInput.nextLine();
+		System.out.print("Enter the Employee Address: ");
+		addr = strInput.nextLine();
+		bw.write(ID + "," + name + "," + age + "," + addr);
+		bw.flush();
+		bw.newLine();
+		bw.close();
+	}
+
+	public static void ViewAllRecord() throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader("records.txt"));
+		String record;
+		System.out.println(" ------------------------------------------------------");
+		System.out.println("| ID Name Age Address |");
+		System.out.println(" ------------------------------------------------------");
+		while ((record = br.readLine()) != null) {
+			StringTokenizer st = new StringTokenizer(record, ",");
+			System.out.println(
+					"| " + st.nextToken() + " " + st.nextToken() + "" + st.nextToken() + " " + st.nextToken() + " |");
+		}
+		System.out.println("| |");
+		System.out.println(" ------------------------------------------------------------- ");
+		br.close();
+	}
+
+	public static void DeleteRecordByID() throws IOException {
+		Scanner strInput = new Scanner(System.in);
+		String ID, record;
+		File tempDB = new File("records_temp.txt");
+		File db = new File("records.txt");
+		BufferedReader br = new BufferedReader(new FileReader(db));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(tempDB));
+		System.out.println("\t\t Delete Employee Record\n");
+		System.out.println("Enter the Employee ID: ");
+		ID = strInput.nextLine();
+		while ((record = br.readLine()) != null) {
+			if (record.contains(ID))
+				continue;
+			bw.write(record);
+			bw.flush();
+			bw.newLine();
+		}
+		br.close();
+		bw.close();
+		db.delete();
+		tempDB.renameTo(db);
+	}
+
+	public static void SearchRecordbyID() throws IOException {
+		String ID, record;
+		Scanner strInput = new Scanner(System.in);
+		BufferedReader br = new BufferedReader(new FileReader("records.txt"));
+		System.out.println("\t\t Search Employee Record\n");
+		System.out.println("Enter the Employee ID: ");
+		ID = strInput.nextLine();
+		System.out.println(" ------------------------------------------------------------- ");
+		System.out.println("| ID Name Age Address |");
+		System.out.println(" ------------------------------------------------------------- ");
+		while ((record = br.readLine()) != null) {
+			StringTokenizer st = new StringTokenizer(record, ",");
+			if (record.contains(ID)) {
+				System.out.println("| " + st.nextToken() + "" + st.nextToken() + " " + st.nextToken() + " "
+						+ st.nextToken() + "|");
+			}
+		}
+		System.out.println("| |");
+		System.out.println(" ------------------------------------------------------------- ");
+		br.close();
+	}
+
+	public static void updateRecordbyID() throws IOException {
+		String newName, newAge, newAddr, record, ID, record2;
+		File db = new File("records.txt");
+		File tempDB = new File("records_temp.txt");
+		BufferedReader br = new BufferedReader(new FileReader(db));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(tempDB));
+		Scanner strInput = new Scanner(System.in);
+		System.out.println("\t\t Update Employee Record\n\n");
+		/**/
+		System.out.println("Enter the Employee ID: ");
+		ID = strInput.nextLine();
+		System.out.println(" -----------------------------------------");
+		System.out.println("| ID Name Age Address |");
+		System.out.println(" -----------------------------------------");
+		while ((record = br.readLine()) != null) {
+			StringTokenizer st = new StringTokenizer(record, ",");
+			if (record.contains(ID)) {
+				System.out.println("| " + st.nextToken() + "" + st.nextToken() + " " + st.nextToken() + " "
+						+ st.nextToken() + "|");
+			}
+		}
+		System.out.println("| |");
+		System.out.println(" --------------------------------------");
+		br.close();
+		/**/
+		System.out.println("Enter the new Name: ");
+		newName = strInput.nextLine();
+		System.out.println("Enter the new Age: ");
+		newAge = strInput.nextLine();
+		System.out.println("Enter the new Address: ");
+		newAddr = strInput.nextLine();
+		BufferedReader br2 = new BufferedReader(new FileReader(db));
+		while ((record2 = br2.readLine()) != null) {
+			if (record2.contains(ID)) {
+				bw.write(ID + "," + newName + "," + newAge + "," + newAddr);
+			} else {
+				bw.write(record2);
+			}
+			bw.flush();
+			bw.newLine();
+		}
+		bw.close();
+		br2.close();
+		db.delete();
+		boolean success = tempDB.renameTo(db);
+		System.out.println(success);
+	}
+}
